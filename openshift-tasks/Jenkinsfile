@@ -26,10 +26,9 @@ podTemplate(
 
     // Build the Tasks Service
     dir('openshift-tasks') {
-      // Variables for POM Version, Dev & Prod taggs.   getVersionFromPom not working in OpenShift Jenkins.  Using command instead
-      def version = getVersionFromPom("pom.xml")
+      // Variables for POM Version, Dev & Prod tags.
 
-      //def version = "2.0"
+      def version = getVersionFromPom("pom.xml")
       def devTag  = ""
       def prodTag = ""
       def nexusURL  = "http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases"
@@ -38,10 +37,7 @@ podTemplate(
       stage('Build war') {
         echo "Building version ${devTag}"
         sh "${mvnCmd} clean package -DskipTests=true"
-
       }
-
-      // TBD: The next two stages should run in parallel
 
       stage('Parallel'){
 				parallel firstBranch: {
