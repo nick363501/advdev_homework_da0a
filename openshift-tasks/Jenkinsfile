@@ -29,7 +29,7 @@ podTemplate(
       // Variables for POM Version, Dev & Prod taggs.   getVersionFromPom not working in OpenShift Jenkins.  Using command instead
       //def version = getVersionFromPom("pom.xml")
 
-      def = sh (grep -m2 "version" pom.xml | tail -n1 | grep -v -e '<?xml|~'| head -n 2 | sed 's/[[:space:]]//g' | sed -E 's/<.{0,1}version>//g' | awk '{print $1}')
+      def version = sh (grep -m2 "version" pom.xml | tail -n1 | grep -v -e '<?xml|~'| head -n 2 | sed 's/[[:space:]]//g' | sed -E 's/<.{0,1}version>//g' | awk '{print $1}' )
       def devTag  = ""
       def prodTag = ""
       def nexusURL  = "http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases"
