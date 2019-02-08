@@ -27,9 +27,9 @@ podTemplate(
     // Build the Tasks Service
     dir('openshift-tasks') {
       // Variables for POM Version, Dev & Prod taggs.   getVersionFromPom not working in OpenShift Jenkins.  Using command instead
-      //def version = getVersionFromPom("pom.xml")
+      def version = getVersionFromPom("pom.xml")
 
-      def version = "2.0"
+      //def version = "2.0"
       def devTag  = ""
       def prodTag = ""
       def nexusURL  = "http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases"
@@ -82,43 +82,42 @@ podTemplate(
 				openshiftVerifyDeployment depCfg: 'tasks', namespace: '${GUID}-tasks-dev', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '', waitUnit: 'sec'
 				openshiftVerifyService namespace: '${GUID}-tasks-dev', svcName: 'tasks', verbose: 'false'
       }
+
+      // Pick up here
+
+      // Copy Image to Nexus container registry
+      stage('Copy Image to Nexus container registry') {
+        echo "Copy image to Nexus container registry"
+
+        // TBD: Copy image to Nexus container registry
+
+        // TBD: Tag the built image with the production tag.
+      }
+
+      // Blue/Green Deployment into Production
+      // -------------------------------------
+      def destApp   = "tasks-green"
+      def activeApp = ""
+
+      stage('Blue/Green Production Deployment') {
+        // TBD: Determine which application is active
+        //      Set Image, Set VERSION
+        //      Deploy into the other application
+        //      Make sure the application is running and ready before proceeding
+      }
+
+      stage('Switch over to new Version') {
+        echo "Switching Production application to ${destApp}."
+        // TBD: Execute switch
+      }
     }
   }
 }
 
-//       // Copy Image to Nexus container registry
-//       stage('Copy Image to Nexus container registry') {
-//         echo "Copy image to Nexus container registry"
-
-//         // TBD: Copy image to Nexus container registry
-
-//         // TBD: Tag the built image with the production tag.
-//       }
-
-//       // Blue/Green Deployment into Production
-//       // -------------------------------------
-//       def destApp   = "tasks-green"
-//       def activeApp = ""
-
-//       stage('Blue/Green Production Deployment') {
-//         // TBD: Determine which application is active
-//         //      Set Image, Set VERSION
-//         //      Deploy into the other application
-//         //      Make sure the application is running and ready before proceeding
-//       }
-
-//       stage('Switch over to new Version') {
-//         echo "Switching Production application to ${destApp}."
-//         // TBD: Execute switch
-//       }
-//     }
-//   }
-// }
-
-// // Convenience Functions to read version from the pom.xml
-// // Do not change anything below this line.
-// // --------------------------------------------------------
-// def getVersionFromPom(pom) {
-//   def matcher = readFile(pom) =~ '<version>(.+)</version>'
-//   matcher ? matcher[0][1] : null
-// }
+// Convenience Functions to read version from the pom.xml
+// Do not change anything below this line.
+// --------------------------------------------------------
+def getVersionFromPom(pom) {
+  def matcher = readFile(pom) =~ '<version>(.+)</version>'
+  matcher ? matcher[0][1] : null
+}
