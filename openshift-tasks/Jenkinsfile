@@ -28,9 +28,9 @@ podTemplate(
     dir('openshift-tasks') {
       // Variables for POM Version, Dev & Prod tags.
 
-      def version = getVersionFromPom("pom.xml")
-      def devTag  = ""
-      def prodTag = ""
+			def version = getVersionFromPom("pom.xml")
+			def devTag  = "${version}-${BUILD_NUMBER}"
+			def prodTag = "${version}"
       def nexusURL  = "http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases"
       def sonarURL = "http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000"
 
