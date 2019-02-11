@@ -61,9 +61,9 @@ podTemplate(
       // Build the OpenShift Image in OpenShift and tag it.
       stage('Build and Tag OpenShift Image') {
         echo "Building OpenShift container image tasks:${devTag}"
-        sh "oc whoami -t"
-        sh "oc -n default get dc/docker-registry"
+
         sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:redhat docker://docker-registry.default.svc.cluster.local:5000/${GUID}-tasks-dev/tasks:${devTag} docker://nexus-registry.gpte-hw-cicd.svc.cluster.local:5000/tasks:${devTag}"
+        
 				openshiftTag alias: 'false', destStream: 'tasks', destTag: prodTag, destinationNamespace: '${GUID}-tasks-dev', namespace: '${GUID}-tasks-dev', srcStream: 'tasks', srcTag: devTag, verbose: 'false'
       }
 
