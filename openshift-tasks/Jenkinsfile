@@ -32,24 +32,38 @@ podTemplate(
 			def devTag  = "${version}-${BUILD_NUMBER}"
 			def prodTag = "${version}"
       def nexusURL  = "http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases"
-      def sonarURL = "http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000"
+      def sonarURL = "http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000/"
+      def devProject = "da0a-tasks-dev"
+      def prodProject = "da0a-tasks-prod"
 
+
+      //Build WAR File
       stage('Build war') {
         echo "Building version ${devTag}"
         sh "${mvnCmd} clean package -DskipTests=true"
       }
+    // Next two steps run in Parallel
+ stage("Testing") {
+        parallel(first:{
+            // Using Maven run the unit tests
+            stage('Unit Tests') {
+              echo "Running Unit Tests"
+              //Execute Unit Tests
+              sh "${mvnCmd} test"
+              step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
+            }
+          },
+          second:{
+            // Using Maven to call SonarQube for Code Analysis
+            stage('Code Analysis') {
+              echo "Running Code Analysis"
 
-      stage('Parallel'){
-				parallel firstBranch: {
-					stage('Unit Tests') {
-						sh "${mvnCmd} test"
-					}
-				}, secondBranch: {
-					stage('Code Analysis') {
-						sh "${mvnCmd} sonar:sonar -Dsonar.host.url=${sonarURL} -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
-					} 
-				}
-			}
+              // TBD: Execute Sonarqube Tests
+            //  sh "${mvnCmd} sonar:sonar -Dsonar.host.url=http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000/ -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+            }
+          })
+      }
+
 
       // Publish the built war file to Nexus
       stage('Publish to Nexus') {
@@ -61,10 +75,16 @@ podTemplate(
       // Build the OpenShift Image in OpenShift and tag it.
       stage('Build and Tag OpenShift Image') {
         echo "Building OpenShift container image tasks:${devTag}"
-
-        sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:redhat docker://docker-registry.default.svc.cluster.local:5000/${GUID}-tasks-dev/tasks:${devTag} docker://nexus-registry.gpte-hw-cicd.svc.cluster.local:5000/tasks:${devTag}"
-        
-				openshiftTag alias: 'false', destStream: 'tasks', destTag: prodTag, destinationNamespace: '${GUID}-tasks-dev', namespace: '${GUID}-tasks-dev', srcStream: 'tasks', srcTag: devTag, verbose: 'false'
+//        sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:redhat docker://docker-registry.default.svc.cluster.local:5000/${GUID}-tasks-dev/tasks:${devTag} docker://nexus-registry.gpte-hw-cicd.svc.cluster.local:5000/tasks:${devTag}"
+//				openshiftTag alias: 'false', destStream: 'tasks', destTag: prodTag, destinationNamespace: '${GUID}-tasks-dev', namespace: '${GUID}-tasks-dev', srcStream: 'tasks', srcTag: devTag, verbose: 'false'
+         script {
+          openshift.withCluster() {
+            openshift.withProject("${devProject}") {
+            openshift.selector("bc", "tasks").startBuild("--from-file=http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases/org/jboss/quickstarts/eap/tasks/${prodTag}/tasks-${prodTag}.war", "--wait=true")
+            openshift.tag("tasks:latest", "tasks:${devTag}")  
+            }
+          }
+         }
       }
 
       // Deploy the built image to the Development Environment.
