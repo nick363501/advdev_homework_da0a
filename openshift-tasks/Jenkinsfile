@@ -33,6 +33,8 @@ podTemplate(
 			def prodTag = "${version}"
       def nexusURL  = "http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases"
       def sonarURL = "http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000"
+      def devProject = "da0a-tasks-dev"
+      def prodProject = "da0a-taks-prod"
 
       stage('Build war') {
         echo "Building version ${devTag}"
