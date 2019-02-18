@@ -84,7 +84,7 @@ podTemplate(
 				sh "oc delete configmap tasks-config -n ${GUID}-tasks-dev --ignore-not-found=true"
 				sh "oc create configmap tasks-config --from-file=./configuration/application-users.properties --from-file=./configuration/application-roles.properties -n ${GUID}-tasks-dev"
 		  
-        // Verify service is running before proceeding
+       // Verify service is running before proceeding
 				openshiftDeploy depCfg: 'tasks', namespace: '${GUID}-tasks-dev', verbose: 'false', waitTime: '', waitUnit: 'sec'
 				openshiftVerifyDeployment depCfg: 'tasks', namespace: '${GUID}-tasks-dev', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '', waitUnit: 'sec'
 				openshiftVerifyService namespace: '${GUID}-tasks-dev', svcName: 'tasks', verbose: 'false'
@@ -94,14 +94,17 @@ podTemplate(
 
       // Copy Image to Nexus container registry
       stage('Copy Image to Nexus container registry') {
-        echo "Copy image to Nexus container registry"
-
-        sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:redhat docker://docker-registry.default.svc.cluster.local:5000/${GUID}-tasks-dev/tasks:${devTag} docker://nexus-registry.gpte-hw-cicd.svc.cluster.local:5000/tasks:${devTag}"
-				
-        openshiftTag alias: 'false', destStream: 'tasks', destTag: prodTag, destinationNamespace: '${GUID}-tasks-dev', namespace: '$GUID}-tasks-dev', srcStream: 'tasks', srcTag: devTag, verbose: 'false'
-			  } 
-      
-
+        script {
+          sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:redhat docker://docker-registry.default.svc.cluster.local:5000/${devProject}/tasks:${devTag} docker://nexus-registry.gpte-hw-cicd.svc.cluster.local:5000/tasks:${devTag}"
+          // Tag the built image with the production tag.
+          openshift.withCluster() {
+            openshift.withProject("${prodProject}") {
+              openshift.tag("${devProject}/tasks:${devTag}", "${devProject}/tasks:${prodTag}")
+            }
+          }
+        }
+      }
+			
       // Blue/Green Deployment into Production
       // -------------------------------------
       def destApp   = "tasks-green"
