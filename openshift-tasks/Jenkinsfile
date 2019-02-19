@@ -48,7 +48,7 @@ podTemplate(
 					}
 				}, secondBranch: {
 					stage('Code Analysis') {
-					//	sh "${mvnCmd} sonar:sonar -Dsonar.host.url=${sonarURL} -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+					sh "${mvnCmd} sonar:sonar -Dsonar.host.url=${sonarURL} -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
 					} 
 				}
 			}
@@ -90,8 +90,6 @@ podTemplate(
 				openshiftVerifyService namespace: '${GUID}-tasks-dev', svcName: 'tasks', verbose: 'false'
       }
 
-      // Pick up here
-
       // Copy Image to Nexus container registry
       stage('Copy Image to Nexus container registry') {
         script {
@@ -122,6 +120,7 @@ podTemplate(
         // TBD: Execute switch
       }
     }
+
   }
 }
 
