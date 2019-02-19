@@ -51,7 +51,7 @@ podTemplate(
           // -----------------------------------------------------------------
           // THIS LINE IS COMMENTED OUT DUE TO THE SERVER NOT BEING AVAILABLE.
           //------------------------------------------------------------------ 
-					sh "${mvnCmd} sonar:sonar -Dsonar.host.url=${sonarURL} -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+					//sh "${mvnCmd} sonar:sonar -Dsonar.host.url=${sonarURL} -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
 					} 
 				}
 			}
