@@ -48,7 +48,7 @@ podTemplate(
 					}
 				}, secondBranch: {
 					stage('Code Analysis') {
-					sh "${mvnCmd} sonar:sonar -Dsonar.host.url=${sonarURL} -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+					//sh "${mvnCmd} sonar:sonar -Dsonar.host.url=${sonarURL} -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
 					} 
 				}
 			}
