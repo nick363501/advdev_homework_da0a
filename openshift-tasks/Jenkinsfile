@@ -48,7 +48,10 @@ podTemplate(
 					}
 				}, secondBranch: {
 					stage('Code Analysis') {
-					//sh "${mvnCmd} sonar:sonar -Dsonar.host.url=${sonarURL} -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+          // -----------------------------------------------------------------
+          // THIS LINE IS COMMENTED OUT DUE TO THE SERVER NOT BEING AVAILABLE.
+          //------------------------------------------------------------------ 
+					sh "${mvnCmd} sonar:sonar -Dsonar.host.url=${sonarURL} -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
 					} 
 				}
 			}
@@ -59,7 +62,6 @@ podTemplate(
         echo "NEUX URL=${nexusURL}"
         sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::${nexusURL}"
       }
-
 
       // Build the OpenShift Image in OpenShift and tag it.
       stage('Build and Tag OpenShift Image') {
