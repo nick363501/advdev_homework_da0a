@@ -60,7 +60,7 @@ podTemplate(
       stage('Publish to Nexus') {
         echo "Publish to Nexus"
         echo "NEUX URL=${nexusURL}"
-        sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::${nexusURL}"
+        //sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::${nexusURL}"
       }
 
       // Build the OpenShift Image in OpenShift and tag it.
