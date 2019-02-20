@@ -32,7 +32,7 @@ podTemplate(
 			def devTag  = "${version}-${BUILD_NUMBER}"
 			def prodTag = "${version}"
       def nexusURL  = "http://nexus3.gpte-hw-cicd.svc.cluster.local:8081/repository/releases"
-      def sonarURL = "http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000"
+      def sonarURL = "http://sonarqube.gpte-hw-cicd.svc.cluster.local:9000/"
       def devProject = "da0a-tasks-dev"
       def prodProject = "da0a-taks-prod"
 
@@ -60,7 +60,7 @@ podTemplate(
       stage('Publish to Nexus') {
         echo "Publish to Nexus"
         echo "NEUX URL=${nexusURL}"
-        //sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::${nexusURL}"
+        sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::${nexusURL}"
       }
 
       // Build the OpenShift Image in OpenShift and tag it.
