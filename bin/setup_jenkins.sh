@@ -55,6 +55,6 @@ while : ; do
     echo "...Yes. Jenkins is ready."
     break
   fi
-  echo "...no. Sleeping 10 seconds."
-  sleep 10
+  echo "...no. Sleeping 20 seconds."
+  sleep 20
 done
